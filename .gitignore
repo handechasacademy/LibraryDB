@@ -1,0 +1,70 @@
+﻿############################
+# Visual Studio / .NET
+############################
+
+# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# VS cache / temp
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+
+# Rider / VS Code etc.
+.idea/
+*.sln.iml
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+**/packages/*
+*.nuget.props
+*.nuget.targets
+
+# Other generated files
+*.cache
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# EF Core Migrations bundles
+*_efbundle
+
+# Publish output
+publish/
+AppPackages/
+artifacts/
+
+# OS-specific
+# Windows
+Thumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+############################
+# Tools / config
+############################
+
+# User-specific config
+*.swp
+*.swo
+*.tmp
+
+
