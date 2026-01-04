@@ -56,6 +56,27 @@ namespace LibraryApp.UI
             }
         }
 
+        private int ReadYear(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                string input = Console.ReadLine();
+
+                if (int.TryParse(input, out int year))
+                {
+                    if (year >= 1000 && year <= 9999)
+                        return year;
+
+                    Warn("Year must be a 4-digit number.");
+                }
+                else
+                {
+                    Warn("Please enter a valid number for the year.");
+                }
+            }
+        }
+
         private string ReadRequired(string prompt)
         {
             while (true)
@@ -89,23 +110,31 @@ namespace LibraryApp.UI
         {
             try
             {
+                string title = ReadRequired("Enter Title: ");
+                string author = ReadRequired("Enter Author: ");
+                string publisher = ReadRequired("Enter Publisher: ");
+                string category = ReadRequired("Enter Category: ");
+                int year = ReadYear("Enter Publishment Year (YYYY): ");
+
                 var book = new Book
                 {
-                    BookTitle = ReadRequired("Title: "),
-                    Author = ReadRequired("Author: "),
-                    Publisher = Console.ReadLine(),
-                    Category = Console.ReadLine(),
-                    YearPublished = ReadInt("Year Published: ")
+                    BookTitle = title,
+                    Author = author,
+                    Publisher = publisher,
+                    Category = category,
+                    YearPublished = year
                 };
 
                 _repo.AddBook(book);
                 Pause("Book added successfully!");
             }
-            catch (LibraryException ex)
+            catch (LibraryApp.Exceptions.LibraryException ex)
             {
                 Pause(ex.Message);
             }
         }
+
+
 
         private void AddMember()
         {
