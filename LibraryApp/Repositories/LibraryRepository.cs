@@ -15,9 +15,13 @@ namespace LibraryApp.Repositories
 
         public void AddBook(Book book)
         {
+            if (_context.Books.Any(b => b.BookID == book.BookID))
+                throw new DuplicateException($"Book with ID {book.BookID} already exists.");
+
             _context.Books.Add(book);
             _context.SaveChanges();
         }
+
 
         public List<Book> SearchBooks(string query)
         {
@@ -29,12 +33,12 @@ namespace LibraryApp.Repositories
         public void AddMember(Member member)
         {
             if (_context.Members.Any(m => m.MemberID == member.MemberID))
-                throw new DuplicateException(
-                    $"Member with ID {member.MemberID} already exists.");
+                throw new DuplicateException($"Member with ID {member.MemberID} already exists.");
 
             _context.Members.Add(member);
             _context.SaveChanges();
         }
+
 
 
         public void RegisterLoan(int loanId, int bookId, int memberId)

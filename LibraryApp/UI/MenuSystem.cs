@@ -56,6 +56,7 @@ namespace LibraryApp.UI
             }
         }
 
+
         private int ReadYear(string prompt)
         {
             while (true)
@@ -63,19 +64,13 @@ namespace LibraryApp.UI
                 Console.Write(prompt);
                 string input = Console.ReadLine();
 
-                if (int.TryParse(input, out int year))
-                {
-                    if (year >= 1000 && year <= 9999)
-                        return year;
+                if (int.TryParse(input, out int year) && year >= 1000 && year <= 9999)
+                    return year;
 
-                    Warn("Year must be a 4-digit number.");
-                }
-                else
-                {
-                    Warn("Please enter a valid number for the year.");
-                }
+                Warn("Enter a valid 4-digit year.");
             }
         }
+
 
         private string ReadRequired(string prompt)
         {
@@ -110,6 +105,7 @@ namespace LibraryApp.UI
         {
             try
             {
+                int bookId = ReadInt("Enter Book ID: ");
                 string title = ReadRequired("Enter Title: ");
                 string author = ReadRequired("Enter Author: ");
                 string publisher = ReadRequired("Enter Publisher: ");
@@ -118,6 +114,7 @@ namespace LibraryApp.UI
 
                 var book = new Book
                 {
+                    BookID = bookId,
                     BookTitle = title,
                     Author = author,
                     Publisher = publisher,
@@ -134,26 +131,30 @@ namespace LibraryApp.UI
             }
         }
 
-
-
         private void AddMember()
         {
             try
             {
+                int memberId = ReadInt("Enter Member ID: ");
+                string name = ReadRequired("Enter Name: ");
+                string address = ReadRequired("Enter Address: ");
+                string email = ReadRequired("Enter Email: ");
+                string phone = ReadRequired("Enter Phone Number: ");
+
                 var member = new Member
                 {
-                    MemberID = ReadInt("Member ID: "),
-                    MemberName = ReadRequired("Name: "),
-                    Address = Console.ReadLine(),
-                    Email = Console.ReadLine(),
-                    PhoneNumber = Console.ReadLine(),
+                    MemberID = memberId,
+                    MemberName = name,
+                    Address = address,
+                    Email = email,
+                    PhoneNumber = phone,
                     MembershipDate = DateOnly.FromDateTime(DateTime.Now)
                 };
 
                 _repo.AddMember(member);
                 Pause("Member registered successfully!");
             }
-            catch (LibraryException ex)
+            catch (LibraryApp.Exceptions.LibraryException ex)
             {
                 Pause(ex.Message);
             }
@@ -163,18 +164,27 @@ namespace LibraryApp.UI
         {
             try
             {
-                int loanId = ReadInt("Loan ID: ");
-                int bookId = ReadInt("Book ID: ");
-                int memberId = ReadInt("Member ID: ");
+                int loanId = ReadInt("Enter Loan ID: ");
+                int bookId = ReadInt("Enter Book ID: ");
+                int memberId = ReadInt("Enter Member ID: ");
 
                 _repo.RegisterLoan(loanId, bookId, memberId);
                 Pause("Loan registered successfully!");
             }
-            catch (LibraryException ex)
+            catch (LibraryApp.Exceptions.DuplicateException ex)
             {
-                Pause(ex.Message);
+                Pause($"Error: {ex.Message}");
+            }
+            catch (LibraryApp.Exceptions.NotFoundException ex)
+            {
+                Pause($"Error: {ex.Message}");
+            }
+            catch (LibraryApp.Exceptions.RuleException ex)
+            {
+                Pause($"Error: {ex.Message}");
             }
         }
+
 
         private void RegisterReturn()
         {
@@ -194,27 +204,51 @@ namespace LibraryApp.UI
         {
             var loans = _repo.GetActiveLoans();
 
-            Console.WriteLine("\n--- ACTIVE LOANS ---");
-            foreach (var l in loans)
+            if (loans.Count == 0)
             {
-                Console.WriteLine(
-                    $"Loan {l.LoanID}: {l.FkMember.MemberName} → {l.FkBook.BookTitle}");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\nThere are no active loans at the moment.");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.WriteLine("\n--- CURRENT ACTIVE LOANS ---");
+                foreach (var l in loans)
+                {
+                    Console.WriteLine($"ID: {l.LoanID} | {l.FkMember.MemberName} has {l.FkBook.BookTitle}");
+                }
             }
 
-            Pause("");
+            Console.WriteLine("\nPress any key...");
+            Console.ReadKey();
         }
+
 
         private void SearchBooks()
         {
-            Console.Write("Search: ");
-            var q = Console.ReadLine();
+            Console.Write("Search (Title/Author): ");
+            string query = Console.ReadLine();
 
-            var results = _repo.SearchBooks(q);
+            var results = _repo.SearchBooks(query);
 
-            foreach (var b in results)
-                Console.WriteLine($"[{b.BookID}] {b.BookTitle} by {b.Author}");
+            if (results.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\nNo books found matching your query.");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.WriteLine("\n--- SEARCH RESULTS ---");
+                foreach (var b in results)
+                {
+                    Console.WriteLine($"[{b.BookID}] {b.BookTitle} by {b.Author}");
+                }
+            }
 
-            Pause("");
+            Console.WriteLine("\nPress any key...");
+            Console.ReadKey();
         }
+
     }
 }
