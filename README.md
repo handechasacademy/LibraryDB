@@ -1,4 +1,5 @@
-# LibraryDB – Bibliotekssystem
+# LibraryDB – Bibliotekssystem 
+⚠️ **Varning:** Körinstruktioner för databasen och konsolapplikationen finns längre ner i dokumentet. Läs dessa innan du försöker köra projektet.
 
 Detta projekt är ett enkelt bibliotekssystem som är byggt som en konsolapplikation i C# med hjälp av Entity Framework Core och SSMS.  
 Systemet ska simulera hur ett bibliotek kan hantera sina böcker, medlemmar och lån.  
@@ -100,3 +101,68 @@ Execution plans har analyserats för några av de viktigaste frågorna i systeme
   <img width="604" height="509" alt="samebookloan" src="https://github.com/user-attachments/assets/f5045fb0-6dc3-465b-a666-6843b61ce638" />
 
 ---
+
+## Inställningar och Körning
+
+Följ dessa steg för att sätta upp miljön och köra applikationen.
+
+### 1. Databasinställningar (SSMS)
+Eftersom detta projekt använder **Database First**, måste databasen finnas lokalt innan koden körs:
+* **Skapa Databasen:** Öppna SQL Server Management Studio (SSMS) och kör filen `LibraryDB.sql`. Denna fil skapar automatiskt databasen `LibraryDB` med alla tabeller, vyer och lagrade procedurer.
+* **Importera Testdata:** Kör skriptet i mappen `/Data` (t.ex. `SeedData.sql`) för att fylla tabellerna med medlemmar och böcker så att du kan testa systemet direkt.
+
+### 2. Konfigurera Anslutning
+* Öppna `appsettings.json` i projektmappen `LibraryApp`.
+* Ändra `Server` i anslutningssträngen så att den matchar ditt lokala SQL-servernamn.
+
+### 3. Kör applikationen
+1. Öppna terminalen i projektets rotmapp.
+2. Kör följande kommando:
+   ```bash
+   dotnet run --project LibraryApp
+   
+## Användarguide
+
+När programmet körs styrs allt via en numerisk meny (0–6). Här är hur du använder de olika funktionerna:
+
+### 1. Registrera ny bok (Menyval 1)
+Lägg till böcker i bibliotekets samling.
+* Ange ett unikt **Bok-ID** (nummer).
+* Ange titel, författare, förlag och kategori.
+* Ange utgivningsår (t.ex. 1954).
+
+### 2. Registrera ny medlem (Menyval 2)
+Skapa profiler för bibliotekets låntagare.
+* Ange ett unikt **Medlems-ID**.
+* Fyll i namn, adress, e-post och telefonnummer.
+* Medlemskapet skapas automatiskt med dagens datum.
+
+### 3. Registrera lån (Menyval 3)
+Skapa ett nytt lån för en medlem.
+* Ange ett unikt **Låne-ID**.
+* Ange **Bok-ID** och **Medlems-ID** för de objekt som ska kopplas ihop.
+* **Systemlogik**: Programmet kastar en `RuleException` om boken redan är utlånad.
+* Återlämningsdatumet (**DueDate**) beräknas automatiskt till 14 dagar framåt.
+
+### 4. Registrera återlämning (Menyval 4)
+Avsluta ett aktivt lån.
+* Ange det specifika **Låne-ID** som ska lämnas tillbaka.
+* Programmet uppdaterar lånets `ReturnDate` till dagens datum.
+
+### 5. Visa aktiva lån (Menyval 5)
+Visar en lista på alla böcker som för tillfället är utlånade.
+
+### 6. Sök böcker (Menyval 6)
+Hitta specifika böcker i systemet.
+* Skriv in en sökterm (t.ex. en del av en titel eller författarens namn).
+* Applikationen listar alla matchande resultat från databasen.
+
+---
+
+## Teknisk arkitektur
+Projektet är byggt med följande teknologier:
+
+* **C# / .NET 8**
+* **Entity Framework Core (Database First)**
+* **Visual Studio Community 2026** (Version 18.0.2)
+* **SQL Server Management Studio 21** (Version 21.6.17)
